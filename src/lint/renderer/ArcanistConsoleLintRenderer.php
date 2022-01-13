@@ -119,7 +119,6 @@ final class ArcanistConsoleLintRenderer extends ArcanistLintRenderer {
 
     $old = $data;
     $old_lines = phutil_split_lines($old);
-    $old_impact = substr_count($original, "\n") + 1;
     $start = $line;
 
     // See PHI1782. If a linter raises a message at a line that does not
@@ -170,6 +169,7 @@ final class ArcanistConsoleLintRenderer extends ArcanistLintRenderer {
       // Figure out how many "-" and "+" lines we have by counting the newlines
       // for the relevant patches. This may overestimate things if we are adding
       // or removing entire lines, but we'll adjust things below.
+      $old_impact = substr_count($original, "\n") + 1;
       $new_impact = substr_count($replacement, "\n") + 1;
 
       // If this is a change on a single line, we'll try to highlight the
@@ -242,7 +242,7 @@ final class ArcanistConsoleLintRenderer extends ArcanistLintRenderer {
       // If we have "original" text and it is contained on a single line,
       // highlight the affected area. If we don't have any text, we'll mark
       // the character with a caret (below, in rendering) instead.
-      if ($old_impact == 1 && strlen($original)) {
+      if ($original && strlen($original)) {
         $old_lines[$start - 1] = substr_replace(
           $old_lines[$start - 1],
           $this->highlightText($original),
@@ -324,7 +324,7 @@ final class ArcanistConsoleLintRenderer extends ArcanistLintRenderer {
       // If this is just a message and does not have a patch, put a little
       // caret underneath the line to point out where the issue is.
       if ($chevron) {
-        if (!$message->isPatchable() && !strlen($original)) {
+        if (!$message->isPatchable() && $original) {
           $result[] = $this->renderCaret($char)."\n";
         }
       }
